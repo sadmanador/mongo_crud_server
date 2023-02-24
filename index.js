@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 5000;
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 //middleware
 app.use(cors());
@@ -22,8 +22,8 @@ async function run() {
     const userCollection = client
       .db("simple-node-mongo-server")
       .collection("mongo_crud_server");
-    
-      //post user data from inputField
+
+    //post user data from inputField
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await userCollection.insertOne(user);
@@ -31,11 +31,19 @@ async function run() {
     });
 
     //read method
-    app.get('/users',async(req,res)=>{
-      const query = {}
+    app.get("/users", async (req, res) => {
+      const query = {};
       const cursor = userCollection.find(query);
-      const result = await cursor.toArray()
+      const result = await cursor.toArray();
       res.send(result);
+    });
+
+    //delete method
+    app.delete('/users/:id', async(req,res)=>{
+      const id = req.params.id;
+      const query = {_id: ObjectId(id)}
+      const result = await userCollection.deleteOne(query);
+      res.send(result)
     })
   } finally {
   }
